@@ -1,0 +1,14 @@
+{
+  "name": "@subscription-tracker/api",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {},
+  "dependencies": {
+    "aws-sdk": "^2.1152.0",
+    "joi":"^17.6.0",
+    "ulid": "^2.3.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.100"
+  }
+}
