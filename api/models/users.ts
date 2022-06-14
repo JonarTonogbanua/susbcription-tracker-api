@@ -1,6 +1,6 @@
 import { Item } from "./base";
 
-export class User extends Item {
+export class Users extends Item {
 	username: string;
 	email: string;
 

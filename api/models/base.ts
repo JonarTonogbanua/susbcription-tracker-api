@@ -4,10 +4,10 @@ export abstract class Item {
 	abstract get pk(): string;
 	abstract get sk(): string;
 
-	public keys(): DynamoDB.Key {
+	public keys() {
 		return {
-			PK: { S: this.pk },
-			SK: { S: this.sk },
+			pk: this.pk,
+			sk: this.sk,
 		};
 	}
 

@@ -5,15 +5,15 @@ export interface subscriptionCreateRequest {
   billerName: string;
   billerLink ?: string;
   recurringAmount: number;
-  recurringEvery: string;
+  recurringEvery: number;
 }
 
-export default (request: subscriptionCreateRequest): subscriptionCreateRequest  {
+export default (request: subscriptionCreateRequest): subscriptionCreateRequest => {
   const schema = joi.object({
     billerName: joi.string().max(32).allow('', null).required(),
     billerLink: joi.string().max(32).allow('', null).optional(),
     recurringAmount: joi.number().required(),
-    recurringEvery: joi.string().max(32).required(),
+    recurringEvery: joi.number().max(31).required(),
   }).required()
 
   const instance = new Validation<subscriptionCreateRequest>(schema);
