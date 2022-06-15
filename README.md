@@ -2,12 +2,6 @@
 
 An example serverless app created with SST.
 
-## Getting Started
-
-[**Read the tutorial**](https://serverless-stack.com/examples/how-to-create-a-crud-api-with-serverless-using-dynamodb.html)
-
-Install the example.
-
 ```bash
 $ npm install
 # Or with Yarn
