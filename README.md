@@ -1,4 +1,4 @@
-# How to create a CRUD API with serverless using DynamoDB
+# Subscription Tracker API
 
 An example serverless app created with SST.
 
@@ -9,9 +9,9 @@ An example serverless app created with SST.
 Install the example.
 
 ```bash
-$ npm init serverless-stack --example crud-api-dynamodb
+$ npm install
 # Or with Yarn
-$ yarn create serverless-stack --example crud-api-dynamodb
+$ yarn install
 ```
 
 ## Commands
