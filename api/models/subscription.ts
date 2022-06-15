@@ -1,74 +1,221 @@
-import { DynamoDB } from "aws-sdk"
+import { DynamoDB } from "aws-sdk";
 import { ulid } from "ulid";
-import { Item } from "./base"
-import { getClient } from "../utils/client"
+import {
+	format,
+	setDate,
+	getDaysInMonth,
+	getTime,
+	isBefore,
+	addMonths,
+} from "date-fns";
+import { Item } from "./base";
+import { getClient } from "../libs/Dynamo";
+import { executeTransactWrite } from "../utils/transaction";
 
 export class Subscription extends Item {
-	billerName: string
-	billerLink : string
-	billerId: string
-	userId: string
-  recurringAmount: number
-	recurringEvery: number
-	remindAt: number
+	billerName: string;
+	billerLink: string;
+	billerId: string;
+	userId: string;
+	recurringAmount: number;
+	recurringEvery: number;
+	remindAt: number;
 
-	constructor(billerName: string, remindAt: number, recurringAmount : number, recurringEvery : number, billerLink?: string, billerId: string = ulid()) {
-		super()
-		this.billerName = billerName
-		this.recurringAmount = recurringAmount
-		this.recurringEvery = recurringEvery
-		this.remindAt = remindAt
-		this.billerId = billerId
-		this.billerLink = billerLink || ""
-		this.userId = process.env.userId
-}
+	constructor(
+		userId: string = process.env.userId,
+		billerId: string = ulid(),
+		billerName?: string,
+		remindAt?: number,
+		recurringAmount?: number,
+		recurringEvery?: number,
+		billerLink?: string
+	) {
+		super();
+		this.userId = userId;
+		this.billerId = billerId;
+		this.billerName = billerName || "";
+		this.recurringAmount = recurringAmount || 0;
+		this.recurringEvery = recurringEvery || 0;
+		this.remindAt = remindAt || Subscription.validRemindAt(this.recurringEvery);
+		this.billerLink = billerLink || "";
+	}
 
 	get pk(): string {
-		return `SBS#${this.billerId}`;
+		// User Subscription
+		return `US#${this.userId}`;
 	}
 
 	get sk(): string {
-		return `U#${this.userId}`;
+		// Biller
+		return `B#${this.billerId}`;
 	}
 
-	static fromItem(item ?: DynamoDB.AttributeMap): Subscription {
-			if (!item) throw new Error("No item!")
-			return new Subscription(
-					item.billerName,
-					item.billerId,
-					item.billerLink,
-					Number(item.recurringAmount),
-					Number(item.recurringEvery),
-					Number(item.remindAt),
-			)
+	static fromItem(subscription?: DynamoDB.DocumentClient.AttributeMap) {
+		if (!subscription) throw new Error("No item!")
+		const item = subscription;
+
+		return new Subscription(
+			undefined,
+			item.billerId.S,
+			item.billerName.S,
+			Number(item.remindAt.N),
+			Number(item.recurringAmount.N),
+			Number(item.recurringEvery.N),
+			item.billerLink.S
+		);
+	}
+
+	static validRemindAt(recurringEvery: number, force = false) {
+		const cutoff = setDate(new Date(), recurringEvery);
+		const today = new Date();
+		let currentMonthLastDay: number;
+		let currentMonth: Date;
+
+		if (isBefore(cutoff, today) || force) {
+			const temp = addMonths(setDate(today, 1), 1);
+			currentMonthLastDay = getDaysInMonth(temp);
+			currentMonth = temp;
+		} else {
+			currentMonthLastDay = getDaysInMonth(today);
+			currentMonth = today;
+		}
+
+		recurringEvery =
+			recurringEvery > currentMonthLastDay
+				? currentMonthLastDay
+				: recurringEvery;
+		const newCutoff = getTime(currentMonth.setDate(recurringEvery));
+
+		return newCutoff;
 	}
 
 	toItem(): Record<string, unknown> {
 		return {
 			...this.keys(),
-			billerName: this.billerName,
-			recurringAmount: this.recurringAmount,
-			recurringEvery: this.recurringEvery,
-			remindAt: this.remindAt,
-			billerId: this.billerId,
-			billerLink: this.billerLink,
+			billerName: { S: this.billerName },
+			recurringAmount: { N: this.recurringAmount.toString() },
+			recurringEvery: { N: this.recurringEvery.toString() },
+			remindAt: { N: this.remindAt.toString() },
+			billerId: { S: this.billerId },
+			billerLink: { S: this.billerLink },
 		};
 	}
 }
 
-export const createSubscription = async (subscription: Subscription): Promise<Subscription> => {
-	const client = getClient()
+export const createSubscription = async (
+	subscription: Subscription
+): Promise<Subscription> => {
+	const client = getClient();
+	const params = {
+		TableName: process.env.tableName,
+		Item: subscription.toItem(),
+	} as DynamoDB.PutItemInput;
+
 	try {
-			await client
-					.put({
-							TableName: process.env.tableName,
-							Item: subscription.toItem(),
-							ConditionExpression: "attribute_not_exists(PK)"
-					})
-					.promise()
-			return subscription
+		await client.putItem(params).promise();
+		return subscription;
 	} catch (error) {
-			console.log(error)
-			throw error
+		throw error;
 	}
-}
+};
+
+export const getSubscriptions = async (): Promise<Subscription[]> => {
+	const client = getClient();
+
+	const instance = new Subscription();
+
+	try {
+		const subscriptions = await client
+			.query({
+				TableName: process.env.tableName,
+				KeyConditionExpression: "pk = :pk",
+				ExpressionAttributeValues: {
+					":pk": { S: instance.pk },
+				},
+			})
+			.promise();
+		return (
+			subscriptions.Items?.map((subscription) =>
+				Subscription.fromItem(subscription)
+			) || []
+		);
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const getSubscription = async (
+	billerId?: string
+): Promise<Subscription> => {
+	const client = getClient();
+	const instance = new Subscription(undefined, billerId);
+	const params = {
+		TableName: process.env.tableName,
+		Key: instance.keys(),
+	} as DynamoDB.GetItemInput;
+
+	try {
+		const subscription = await client.getItem(params).promise();
+		return Subscription.fromItem(subscription.Item);
+	} catch (error) {
+		throw error;
+	}
+};
+
+export const updateSubscriptionReminder = async (billerId: string) => {
+	const client = getClient();
+	const instance = new Subscription(undefined, billerId);
+	const { recurringAmount, recurringEvery, billerLink, billerName } =
+		await getSubscription(billerId);
+
+
+	const remindAt = Subscription.validRemindAt(recurringEvery, true);
+
+	const resubscribe = new Subscription(
+		undefined,
+		undefined,
+		billerName,
+		remindAt,
+		recurringAmount,
+		recurringEvery,
+		billerLink
+	);
+
+	try {
+	await executeTransactWrite({
+		client,
+		params: {
+			TransactItems: [
+				{
+					Put: {
+						TableName: process.env.tableName,
+						Item: resubscribe.toItem(),
+					},
+				},
+				{
+					Delete: {
+						TableName: process.env.tableName,
+						Key: instance.keys(),
+					},
+				},
+			],
+		},
+	});
+	} catch (error) {}
+};
+
+export const deleteSubscription = async (billerId: string) => {
+	const client = getClient();
+	const instance = new Subscription(undefined, billerId);
+	const params = {
+		TableName: process.env.tableName,
+		Key: instance.keys(),
+	} as DynamoDB.DeleteItemInput;
+	try {
+		await client.deleteItem(params).promise();
+
+		return billerId;
+	} catch (error) {
+		throw error;
+	}
+};

@@ -2,7 +2,7 @@ import { Api, StackContext, Table } from "@serverless-stack/resources";
 
 export function SubscriptionStack({ stack }: StackContext) {
   // Create the table
-  const table = new Table(stack, "Subscriptions", {
+  const table = new Table(stack, "subscriptions", {
     fields: {
       pk: "string",
       sk: "string",
@@ -17,16 +17,17 @@ export function SubscriptionStack({ stack }: StackContext) {
         // Pass in the table name to our API
         environment: {
           tableName: table.tableName,
-          userId: "U$123"
+          userId: "admin"
         },
       },
     },
     routes: {
       "POST   /subscriptions": "functions/apis/subscription_create/handler.main",
-      // "GET    /subscriptions": "functions/subscriptions/list.main",
-      // "GET    /subscriptions/{id}": "functions/subscriptions/get.main",
-      // "PUT    /subscriptions/{id}": "functions/subscriptions/update.main",
-      // "DELETE /subscriptions/{id}": "functions/subscriptions/delete.main",
+      "GET    /subscriptions": "functions/apis/subscription_list/handler.main",
+      "GET    /subscriptions/{id}": "functions/apis/subscription_get/handler.main",
+      // "PUT    /subscriptions/{id}": "functions/apis/subscription_reminder/handler.main",
+      "PUT    /subscriptions/{id}/renew": "functions/apis/subscription_reminder_update/handler.main",
+      "DELETE /subscriptions/{id}": "functions/apis/subscription_delete/handler.main",
     },
   });
 

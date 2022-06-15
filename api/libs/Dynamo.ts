@@ -1,15 +1,14 @@
 import { DynamoDB } from "aws-sdk";
 
-let client = <any> null
+let client : DynamoDB;
 
-export const getClient = (): DynamoDB.DocumentClient => {
+export const getClient = (): DynamoDB => {
   if(client) return client
-  client = new DynamoDB.DocumentClient({
+  client = new DynamoDB({
     httpOptions: {
       connectTimeout: 1000,
       timeout: 1000
     }
   })
-
   return client
 }

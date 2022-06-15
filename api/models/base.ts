@@ -1,15 +1,15 @@
-import { DynamoDB } from "aws-sdk";
+import { DynamoDB } from "aws-sdk"
 
 export abstract class Item {
-	abstract get pk(): string;
-	abstract get sk(): string;
+    abstract get pk(): string
+    abstract get sk(): string
 
-	public keys() {
-		return {
-			pk: this.pk,
-			sk: this.sk,
-		};
-	}
+    public keys(): DynamoDB.Key {
+        return {
+            pk: { S: this.pk },
+            sk: { S: this.sk }
+        }
+    }
 
-	abstract toItem(): Record<string, unknown>;
+    abstract toItem(): Record<string, unknown>
 }
