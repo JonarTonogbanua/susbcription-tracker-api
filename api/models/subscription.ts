@@ -15,6 +15,7 @@ import { executeTransactWrite } from "../utils/transaction";
 export class Subscription extends Item {
 	billerName: string;
 	billerLink: string;
+	planDescription: string;
 	billerId: string;
 	userId: string;
 	recurringAmount: number;
@@ -22,13 +23,14 @@ export class Subscription extends Item {
 	remindAt: number;
 
 	constructor(
-		userId: string = process.env.userId,
 		billerId: string = ulid(),
+		userId: string = process.env.userId || "",
 		billerName?: string,
 		remindAt?: number,
 		recurringAmount?: number,
 		recurringEvery?: number,
-		billerLink?: string
+		billerLink?: string,
+		planDescription?: string
 	) {
 		super();
 		this.userId = userId;
@@ -38,6 +40,7 @@ export class Subscription extends Item {
 		this.recurringEvery = recurringEvery || 0;
 		this.remindAt = remindAt || Subscription.validRemindAt(this.recurringEvery);
 		this.billerLink = billerLink || "";
+		this.planDescription = planDescription || "";
 	}
 
 	get pk(): string {
@@ -55,13 +58,14 @@ export class Subscription extends Item {
 		const item = subscription;
 
 		return new Subscription(
-			undefined,
 			item.billerId.S,
+			undefined,
 			item.billerName.S,
 			Number(item.remindAt.N),
 			Number(item.recurringAmount.N),
 			Number(item.recurringEvery.N),
-			item.billerLink.S
+			item.billerLink.S,
+			item.planDescription.S,
 		);
 	}
 
@@ -98,6 +102,7 @@ export class Subscription extends Item {
 			remindAt: { N: this.remindAt.toString() },
 			billerId: { S: this.billerId },
 			billerLink: { S: this.billerLink },
+			planDescription: { S: this.planDescription }
 		};
 	}
 }
@@ -148,7 +153,7 @@ export const getSubscription = async (
 	billerId?: string
 ): Promise<Subscription> => {
 	const client = getClient();
-	const instance = new Subscription(undefined, billerId);
+	const instance = new Subscription(billerId);
 	const params = {
 		TableName: process.env.tableName,
 		Key: instance.keys(),
@@ -164,8 +169,8 @@ export const getSubscription = async (
 
 export const updateSubscriptionReminder = async (billerId: string) => {
 	const client = getClient();
-	const instance = new Subscription(undefined, billerId);
-	const { recurringAmount, recurringEvery, billerLink, billerName } =
+	const instance = new Subscription(billerId);
+	const { recurringAmount, recurringEvery, billerLink, billerName, planDescription } =
 		await getSubscription(billerId);
 
 
@@ -178,7 +183,8 @@ export const updateSubscriptionReminder = async (billerId: string) => {
 		remindAt,
 		recurringAmount,
 		recurringEvery,
-		billerLink
+		billerLink,
+		planDescription
 	);
 
 	try {
@@ -206,7 +212,7 @@ export const updateSubscriptionReminder = async (billerId: string) => {
 
 export const deleteSubscription = async (billerId: string) => {
 	const client = getClient();
-	const instance = new Subscription(undefined, billerId);
+	const instance = new Subscription(billerId);
 	const params = {
 		TableName: process.env.tableName,
 		Key: instance.keys(),

@@ -3,7 +3,7 @@ import { Subscription, createSubscription } from "../../../models/subscription";
 
 export class SubscriptionCreate {
 	async execute(request: subscriptionCreateRequest) {
-		const { billerName, billerLink, recurringAmount, recurringEvery } = request;
+		const { billerName, billerLink, recurringAmount, recurringEvery, planDescription } = request;
 		const subscription = new Subscription(
 			undefined,
 			undefined,
@@ -11,7 +11,8 @@ export class SubscriptionCreate {
 			undefined,
 			recurringAmount,
 			recurringEvery,
-			billerLink
+			billerLink,
+			planDescription
 		);
 		const result = await createSubscription(subscription);
 

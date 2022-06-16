@@ -6,6 +6,8 @@ export function SubscriptionStack({ stack }: StackContext) {
     fields: {
       pk: "string",
       sk: "string",
+      gs1pk: "string",
+      gs1sk: "string",
     },
     primaryIndex: { partitionKey: "pk", sortKey: "sk" },
   });
