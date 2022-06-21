@@ -1,0 +1,50 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Users\Intel\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js install
+
+PATH: 
+  C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\Intel\bin;C:\Python310\Scripts;C:\Python310;C:\Program Files (x86)\Razer Chroma SDK\bin;C:\Program Files\Razer Chroma SDK\bin;C:\Program Files (x86)\Razer\ChromaBroadcast\bin;C:\Program Files\Razer\ChromaBroadcast\bin;C:\Python39\Scripts;C:\Python39;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\ProgramData\chocolatey\bin;C:\Program Files\Git\cmd;D:\Programs\PHP\7.4.5;C:\ProgramData\ComposerSetup\bin;C:\Program Files (x86)\Microsoft SQL Server\150\DTS\Binn;C:\Program Files\Azure Data Studio\bin;C:\Windows\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\PuTTY;C:\Users\Intel\AppData\Local\Microsoft\WindowsApps;C:\Users\Intel\AppData\Roaming\npm;C:\Users\Intel\AppData\Roaming\Composer\vendor\bin;C:\Users\Intel\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Users\Intel\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Program Files\Docker\Docker\resources\bin;C:\ProgramData\DockerDesktop\version-bin;C:\Program Files\Amazon\AWSCLIV2;C:\Program Files\nodejs;C:\Program Files\Microsoft SQL Server\150\Tools\Binn;C:\Program Files\dotnet;C:\Users\Intel\AppData\Local\Microsoft\WindowsApps;C:\Users\Intel\AppData\Roaming\Composer\vendor\bin;C:\Program Files\Azure Data Studio\bin;C:\Users\Intel\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\Intel\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Users\Intel\AppData\Local\GitHubDesktop\bin;C:\Users\Intel\AppData\Roaming\npm
+
+Yarn version: 
+  1.22.18
+
+Node version: 
+  16.14.2
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: EPERM: operation not permitted, unlink 'D:\Work\Kroma\subscription-tracker-api\node_modules\esbuild-windows-64\esbuild.exe'
+
+npm manifest: 
+  {
+    "name": "subscription-tracker-api",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+      "start": "sst start",
+      "build": "sst build",
+      "deploy": "sst deploy --stage=production",
+      "remove": "sst remove",
+      "console": "sst console",
+      "typecheck": "tsc --noEmit",
+      "test": "vitest run"
+    },
+    "devDependencies": {
+      "@serverless-stack/cli": "^1.2.21",
+      "@serverless-stack/resources": "^1.2.21",
+      "@tsconfig/node16": "^1.0.3",
+      "aws-cdk-lib": "2.24.0",
+      "typescript": "^4.7.3",
+      "vitest": "^0.14.2"
+    },
+    "workspaces": [
+      "api"
+    ]
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

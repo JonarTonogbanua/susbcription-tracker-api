@@ -1,11 +1,13 @@
 
-import { DynamoDB } from "aws-sdk";
-import { Subscription, deleteSubscription } from "../../../models/subscription";
-
+import { SubscriptionRepository } from "../../../repositories/SubscriptionRepository";
+import { Responses } from "./response";
 export class SubscriptionDelete {
-  async execute(billerId: string) {
-    const result = deleteSubscription(billerId)
-    
-    return result
+  private subscriptionRepository: SubscriptionRepository;
+
+	constructor() {
+		this.subscriptionRepository = new SubscriptionRepository();
+	}
+  async execute(billerId: string): Promise<void> {
+    await this.subscriptionRepository.deleteSubscription(billerId);
   }
 }

@@ -1,11 +1,14 @@
-
-import { DynamoDB } from "aws-sdk";
-import { Subscription, getSubscriptions } from "../../../models/subscription";
+import { SubscriptionRepository } from "../../../repositories/SubscriptionRepository";
 
 export class SubscriptionList {
-  async execute() {
-    const result: Promise<Subscription[]> = getSubscriptions()
-    
-    return result
-  }
+	private subscriptionRepository: SubscriptionRepository;
+
+	constructor() {
+		this.subscriptionRepository = new SubscriptionRepository();
+	}
+
+	async execute() {
+		const result = await this.subscriptionRepository.getSubscriptions();
+		return result;
+	}
 }

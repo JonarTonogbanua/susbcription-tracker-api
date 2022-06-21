@@ -1,19 +1,17 @@
 import { APIGatewayProxyEventV2 } from "aws-lambda";
-import { SubscriptionDelete } from "./action"
+import { API_SUCCESS, THROW_API_ERROR } from "../../../libs/Response";
+import { SubscriptionDelete } from "./action";
+import { Responses } from "./response";
 
-export const main = async(event: APIGatewayProxyEventV2) => {
-  try {
-    const action = new SubscriptionDelete();
-    const result = await action.execute(event.pathParameters?.id || "");
+export const main = async (event: APIGatewayProxyEventV2) => {
+	try {
+		const action = new SubscriptionDelete();
+		await action.execute(event.pathParameters?.id || "");
 
-    return {
-      message: "successfully deleted",
-      body: result
-    }
-  } catch (error) {
-    return {
-      statusCode: 403,
-      error
-    }
-  }
-}
+		return API_SUCCESS({
+			...Responses.STATUS_200
+		});
+	} catch (error) {
+		return THROW_API_ERROR(error);
+	}
+};

@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@anatine/esbuild-decorators": "^0.2.19",
     "@serverless-stack/cli": "^1.2.21",
     "@serverless-stack/resources": "^1.2.21",
     "@tsconfig/node16": "^1.0.3",

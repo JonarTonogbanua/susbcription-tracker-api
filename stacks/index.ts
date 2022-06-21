@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { SubscriptionStack } from "./SubscriptionStack";
 import { App } from "@serverless-stack/resources";
 

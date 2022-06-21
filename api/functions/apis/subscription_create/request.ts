@@ -14,10 +14,11 @@ export default (request: subscriptionCreateRequest): subscriptionCreateRequest =
     billerName: joi.string().max(32).allow('', null).required(),
     planDescription: joi.string().max(100).allow('', null).optional(),
     billerLink: joi.string().max(32).allow('', null).optional(),
-    recurringAmount: joi.number().required(),
+    recurringAmount: joi.number().max(500).required(),
     recurringEvery: joi.number().max(31).required(),
   }).required()
 
   const instance = new Validation<subscriptionCreateRequest>(schema);
+  
   return instance.validate(request);
 }

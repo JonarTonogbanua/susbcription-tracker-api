@@ -1,12 +1,17 @@
-
-import { DynamoDB } from "aws-sdk";
-import { Subscription, getSubscription } from "../../../models/subscription";
-
+import { SubscriptionRepository } from "../../../repositories/SubscriptionRepository";
 
 export class SubscriptionGet {
-  async execute(billerId: string) {
-    const result: Promise<Subscription> = getSubscription(billerId)
-    
-    return result
-  }
+	private subscriptionRepository: SubscriptionRepository;
+
+	constructor() {
+		this.subscriptionRepository = new SubscriptionRepository();
+	}
+
+	async execute(billerId: string) {
+		const AUTH_USER_ID = process.env.userId;
+
+		const result = this.subscriptionRepository.getSubscription(billerId);
+
+		return result;
+	}
 }
