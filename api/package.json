@@ -8,6 +8,7 @@
     "joi":"^17.6.0",
     "ulid": "^2.3.0",
     "date-fns": "^2.28.0",
+    "jsonwebtoken": "^8.5.1",
     "@aws/dynamodb-data-mapper": "^0.7.3",
     "@aws/dynamodb-data-mapper-annotations": "^0.7.3"
   },
